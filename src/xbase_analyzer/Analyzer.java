@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,6 +48,30 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class Analyzer {
+	private final class EClassNameComparator implements Comparator<EClass> {
+		final EClassToString e2s = new EClassToString();
+
+		@Override
+		public int compare(final EClass o1, final EClass o2) {
+			return e2s.apply(o1).compareTo(e2s.apply(o2));
+		}
+	}
+
+	private final class EClassToString implements Function<EClass, String> {
+		@Override
+		public String apply(final EClass eClass) {
+			final EPackage ePackage = eClass.getEPackage();
+			final String ret;
+			if (ePackage != null) {
+				ret = ePackage.getName() + "." + eClass.getName();
+			} else {
+				ret = eClass.getName();
+			}
+
+			return ret;
+		}
+	}
+
 	private final class EClassConsumer implements Consumer<EClassifier> {
 		private final Set<EClass> visitedClasses;
 		private final Set<EPackage> visitedPackages;
@@ -110,13 +136,8 @@ public class Analyzer {
 	}
 
 	@Test
-	public void testLOL() throws IOException {
-
+	public void test() throws IOException {
 		new Analyzer().exec();
-		// new Analyzer().checkClassesHierarchy();
-
-		// new Analyzer().isParentOf(, QualifiedName.class);
-
 	}
 
 	private void checkClassesHierarchy() {
@@ -153,38 +174,47 @@ public class Analyzer {
 	private Provider<ResourceSet> resourceSetProvider;
 
 	public void exec() throws IOException {
-		// final Injector injector = new
-		// XtextStandaloneSetup().createInjectorAndDoEMFRegistration();
-		// final Analyzer main = injector.getInstance(Analyzer.class);
-
-		// main.xtextAnalysis(
-		// "/home/mleduc/git/xtext-extras/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
-		// main.xtextAnalysis(
-		// "/home/mleduc/git/xtext-extras/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext");
-		//
-		//
-		// System.out.println("-----------------------");
-
-		// this.ecoreAnalysis("/home/mleduc/git/xtext-extras/org.eclipse.xtext.xbase/model/XAnnotations.ecore");
 		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore");
-
-		// main.xtextAnalysis(
-		// "/home/mleduc/git/xtext-extras/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
-
-		// ecoreAnalysis();
 	}
 
-	private void ecoreAnalysis(final String file) {
-		// final ResourceSet set = new ResourceSetImpl();
+	private void ecoreAnalysis(final String path) {
+		final ResourceSet set = initResourceSet();
+		final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
 
+		final EPackage epackage = (EPackage) resource.getContents().get(0);
+
+		final Set<EClass> visitedClasses = new HashSet<>();
+		final Set<EPackage> visitedPackages = new HashSet<>();
+		visitedPackages.add(epackage);
+		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+
+		// Produce a dependency graph of the targeted EPackage
+		epackage.getEClassifiers().forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
+
+		produceEcoreCSV(graph);
+
+	}
+
+	private void produceEcoreCSV(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
+		try {
+			final CsvListWriter csv = new CsvListWriter(new FileWriter(new File("results.csv")),
+					CsvPreference.STANDARD_PREFERENCE);
+
+			final List<String> headers = buildCSVHeader(graph);
+			csv.writeHeader(headers.toArray(new String[headers.size()]));
+
+			graph.vertexSet().stream().sorted(new EClassNameComparator()).forEach(c -> 
+				
+			});;
+
+			csv.close();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private ResourceSet initResourceSet() {
 		final ResourceSet set = new XtextResourceSet();
-
-		// set.getResourceFactoryRegistry().getExtensionToFactoryMap().put(
-		// "ecore", new EcoreResourceFactoryImpl());
-		//
-		// final XtextPlatformResourceURIHandler handler = new
-		// XtextPlatformResourceURIHandler();
 
 		final URIHandlerImpl handler = new org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl() {
 
@@ -197,66 +227,19 @@ public class Analyzer {
 			}
 
 		};
-		// tru.setResourceSet(set);
 		set.getLoadOptions().put(XMLResource.OPTION_URI_HANDLER, handler);
-		final Resource resource = set.getResource(URI.createPlatformPluginURI(file, false), true);
-
-		// EcoreUtil2.resolveAll(resource.getContents().get(0));
-		// System.out.println(EcorePlugin.getPlatformResourceMap());
-		// System.out.println(
-		// EcorePlugin.resolvePlatformResourcePath("/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore"));
-		//
-		// System.out.println(set.getResource(
-		// URI.createPlatformPluginURI("/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore",
-		// false), true));
-
-		final EPackage epackage = (EPackage) resource.getContents().get(0);
-
-		final Set<EClass> visitedClasses = new HashSet<>();
-		final Set<EPackage> visitedPackages = new HashSet<>();
-		visitedPackages.add(epackage);
-
-		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-
-		// Produce a dependency graph of the targeted EPackage
-		epackage.getEClassifiers().forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
-
-		System.out.println(graph);
-		System.out.println(graph.vertexSet().size());
-		System.out.println(graph.edgeSet().size());
-		System.out.println(
-				visitedPackages.stream().map(x -> x.toString()).collect(Collectors.joining(System.lineSeparator())));
-
-		try {
-			final CsvListWriter csv = new CsvListWriter(new FileWriter(new File("results.csv")),
-					CsvPreference.STANDARD_PREFERENCE);
-
-			final List<String> headers = graph.vertexSet().stream().filter(x -> x.getName() != null).map(x -> {
-				final EPackage ePackage2 = x.getEPackage();
-				final String ret;
-				if (ePackage2 != null) {
-					ret = ePackage2.getName() + "." + x.getName();
-				} else {
-					ret = x.getName();
-				}
-
-				return ret;
-			}).sorted().collect(Collectors.toList());
-
-			final List<String> headers2 = new ArrayList<>();
-			headers2.add("");
-			headers2.addAll(headers);
-
-			csv.writeHeader(headers2.toArray(new String[headers2.size()]));
-
-			csv.close();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
+		return set;
 	}
 
-	// xtextAnalysis(file);
+	private List<String> buildCSVHeader(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
+		final List<String> headers = graph.vertexSet().stream().map(new EClassToString()).sorted()
+				.collect(Collectors.toList());
+
+		final List<String> ret = new ArrayList<>();
+		ret.add("");
+		ret.addAll(headers);
+		return ret;
+	}
 
 	private void xtextAnalysis(final String file) throws IOException {
 		final ResourceSet set = resourceSetProvider.get();
@@ -293,8 +276,6 @@ public class Analyzer {
 
 		final Stream<String> xBaseDependencies = extractDependencies(xBaseClassifiers).distinct().sorted();
 		final Stream<String> xtypeDependencies = extractDependencies(xtypeClassifiers).distinct().sorted();
-		// final Stream<String> dependencies = Stream.concat(xBaseDependencies,
-		// xtypeDependencies).distinct().sorted();
 		final String a = xBaseDependencies.collect(Collectors.joining(System.lineSeparator()));
 		final String b = xtypeDependencies.collect(Collectors.joining(System.lineSeparator()));
 
