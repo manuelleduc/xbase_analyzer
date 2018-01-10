@@ -12,13 +12,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,102 +52,9 @@ import org.supercsv.prefs.CsvPreference;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import xbase.reports.EcoreCSVReport;
+
 public class Analyzer {
-	private final class EClassNameComparator implements Comparator<EClass> {
-		final EClassToString e2s = new EClassToString();
-
-		@Override
-		public int compare(final EClass o1, final EClass o2) {
-			return e2s.apply(o1).compareTo(e2s.apply(o2));
-		}
-	}
-
-	private final class EClassToString implements Function<EClass, String> {
-
-		private final String separator;
-
-		EClassToString() {
-			this(".");
-		}
-
-		EClassToString(final String sep) {
-			this.separator = sep;
-		}
-
-		@Override
-		public String apply(final EClass eClass) {
-			final EPackage ePackage = eClass.getEPackage();
-			final String ret;
-			if (ePackage != null) {
-				ret = ePackage.getName() + separator + eClass.getName();
-			} else {
-				ret = eClass.getName();
-			}
-
-			return ret;
-		}
-	}
-
-	private final class EClassConsumer implements Consumer<EClassifier> {
-		private final Set<EClass> visitedClasses;
-		private final Set<EPackage> visitedPackages;
-		private final DefaultDirectedGraph<EClass, DefaultEdge> graph;
-
-		private EClassConsumer(final Set<EClass> visitedClasses, final Set<EPackage> visitedPackages,
-				final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
-			this.visitedClasses = visitedClasses;
-			this.visitedPackages = visitedPackages;
-			this.graph = graph;
-		}
-
-		@Override
-		public void accept(final EClassifier c) {
-			if (c instanceof EClass) {
-				if (!visitedClasses.contains(c)) {
-					final EClass cls = (EClass) c;
-					markVisited(cls);
-					registerClass(cls);
-					final EList<EClass> eSuperTypes = cls.getESuperTypes();
-					eSuperTypes.forEach(pc -> {
-						registerClass(pc);
-						graph.addEdge(cls, pc);
-					});
-					eSuperTypes.forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
-
-					cls.getEAllReferences().stream().filter(r -> r.getEType() instanceof EClass).map(r -> {
-						final EClass eType = (EClass) r.getEType();
-						registerClass(eType);
-						graph.addEdge(cls, eType);
-						return eType;
-					}).forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
-				}
-			}
-			// else {
-			// System.out.println(c + " is not an EClass");
-			// }
-		}
-
-		private void markVisited(final EClass cls) {
-			visitedClasses.add(cls);
-			registerPackage(cls.getEPackage());
-		}
-
-		private void registerPackage(final EPackage ePackage) {
-			if (ePackage != null && !visitedPackages.contains(ePackage)) {
-				visitedPackages.add(ePackage);
-				final EList<EClassifier> eClassifiers = ePackage.getEClassifiers();
-				eClassifiers.forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
-			}
-		}
-
-		private void registerClass(final EClass cls) {
-			if (!graph.containsVertex(cls)) {
-				graph.addVertex(cls);
-			}
-			registerPackage(cls.getEPackage());
-		}
-	}
-
 	public static void main(final String[] args) throws Exception {
 		new Analyzer().exec();
 	}
@@ -211,7 +115,7 @@ public class Analyzer {
 		// Produce a dependency graph of the targeted EPackage
 		epackage.getEClassifiers().forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
 
-		produceEcoreCSV(graph);
+		new EcoreCSVReport().produceEcoreCSV(graph);
 		produceEcoreGraphviz(graph);
 		produceEcoreSqlite(graph);
 
@@ -306,42 +210,7 @@ public class Analyzer {
 
 	}
 
-	private void produceEcoreCSV(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
-		try {
-			final CsvListWriter csv = new CsvListWriter(new FileWriter(new File("results.csv")),
-					CsvPreference.STANDARD_PREFERENCE);
-
-			final List<String> headers = buildCSVHeader(graph);
-			csv.writeHeader(headers.toArray(new String[headers.size()]));
-
-			final DijkstraShortestPath<EClass, DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
-
-			final List<EClass> sorted = graph.vertexSet().stream().sorted(new EClassNameComparator())
-					.collect(Collectors.toList());
-
-			sorted.forEach(c1 -> {
-
-				final List<String> line = new ArrayList<>();
-				line.add(new EClassToString().apply(c1));
-				sorted.forEach(c2 -> {
-
-					final GraphPath<EClass, DefaultEdge> dst = dsp.getPath(c1, c2);
-					final String cell = Optional.ofNullable(dst).map(x -> String.valueOf(x.getLength())).orElse("");
-					line.add(cell);
-				});
-
-				try {
-					csv.write(line);
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
-			});
-
-			csv.close();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-	}
+	
 
 	private ResourceSet initResourceSet() {
 		final ResourceSet set = new XtextResourceSet();
@@ -359,16 +228,6 @@ public class Analyzer {
 		};
 		set.getLoadOptions().put(XMLResource.OPTION_URI_HANDLER, handler);
 		return set;
-	}
-
-	private List<String> buildCSVHeader(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
-		final List<String> headers = graph.vertexSet().stream().map(new EClassToString()).sorted()
-				.collect(Collectors.toList());
-
-		final List<String> ret = new ArrayList<>();
-		ret.add("");
-		ret.addAll(headers);
-		return ret;
 	}
 
 	private void xtextAnalysis(final String file) throws IOException {
