@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,18 +61,21 @@ public class Analyzer {
 	}
 
 	public void exec() throws IOException, SQLException {
-		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore");
+		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+				"/org.eclipse.xtext.xbase/model/Xtype.ecore");
 	}
 
-	private void ecoreAnalysis(final String path) throws IOException, SQLException {
+	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {
 		final ResourceSet set = initResourceSet();
-		final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
+		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+		final Set<EClass> visitedClasses = new HashSet<>();
+		final Set<EPackage> visitedPackages = new HashSet<>();
+		for (final String path : paths) {
+			final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
+			final EPackage epackage = (EPackage) resource.getContents().get(0);
+			new EcoreDependencyAnalyzer().ecoreDependencyAnalysis(epackage, graph, visitedClasses, visitedPackages);
 
-		final EPackage epackage = (EPackage) resource.getContents().get(0);
-
-		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new EcoreDependencyAnalyzer()
-				.ecoreDependencyAnalysis(epackage);
-
+		}
 		new EcoreCSVReport().produceEcoreCSV(graph);
 		new EcoreGraphvizReport().produceEcoreGraphviz(graph);
 		new EcoreSqliteReport().produceEcoreSqlite(graph);
