@@ -8,7 +8,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import xbase_analyzer.EClassToString;
+import xbase_analyzer.utils.ecore.EClassToString;
 
 public class EcoreGraphvizReport {
 

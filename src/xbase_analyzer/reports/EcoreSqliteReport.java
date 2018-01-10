@@ -18,8 +18,8 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import xbase_analyzer.EClassNameComparator;
-import xbase_analyzer.EClassToString;
+import xbase_analyzer.utils.ecore.EClassNameComparator;
+import xbase_analyzer.utils.ecore.EClassToString;
 
 public class EcoreSqliteReport {
 

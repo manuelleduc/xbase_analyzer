@@ -8,7 +8,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import xbase_analyzer.EClassConsumer;
+import xbase_analyzer.utils.ecore.EClassConsumer;
 
 public class EcoreDependencyAnalyzer {
 	public DefaultDirectedGraph<EClass, DefaultEdge> ecoreDependencyAnalysis(final EPackage epackage) {

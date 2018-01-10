@@ -1,4 +1,4 @@
-package xbase_analyzer;
+package xbase_analyzer.utils.ecore;
 
 import java.util.Set;
 import java.util.function.Consumer;

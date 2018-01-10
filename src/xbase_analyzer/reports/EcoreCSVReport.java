@@ -16,8 +16,8 @@ import org.jgrapht.graph.DefaultEdge;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import xbase_analyzer.EClassNameComparator;
-import xbase_analyzer.EClassToString;
+import xbase_analyzer.utils.ecore.EClassNameComparator;
+import xbase_analyzer.utils.ecore.EClassToString;
 
 public class EcoreCSVReport {
 	public void produceEcoreCSV(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
