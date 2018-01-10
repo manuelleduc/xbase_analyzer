@@ -10,12 +10,12 @@ import org.eclipse.emf.ecore.EPackage;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-final class EClassConsumer implements Consumer<EClassifier> {
+public final class EClassConsumer implements Consumer<EClassifier> {
 	private final Set<EClass> visitedClasses;
 	private final Set<EPackage> visitedPackages;
 	private final DefaultDirectedGraph<EClass, DefaultEdge> graph;
 
-	EClassConsumer(final Set<EClass> visitedClasses, final Set<EPackage> visitedPackages,
+	public EClassConsumer(final Set<EClass> visitedClasses, final Set<EPackage> visitedPackages,
 			final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
 		this.visitedClasses = visitedClasses;
 		this.visitedPackages = visitedPackages;
@@ -44,9 +44,6 @@ final class EClassConsumer implements Consumer<EClassifier> {
 				}).forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
 			}
 		}
-		// else {
-		// System.out.println(c + " is not an EClass");
-		// }
 	}
 
 	private void markVisited(final EClass cls) {

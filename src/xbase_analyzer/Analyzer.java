@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,11 +39,16 @@ import org.supercsv.prefs.CsvPreference;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import xbase_analyzer.analyzer.EcoreDependencyAnalyzer;
 import xbase_analyzer.reports.EcoreCSVReport;
 import xbase_analyzer.reports.EcoreGraphvizReport;
 import xbase_analyzer.reports.EcoreSqliteReport;
 
 public class Analyzer {
+
+	@Inject
+	private Provider<ResourceSet> resourceSetProvider;
+
 	public static void main(final String[] args) throws Exception {
 		new Analyzer().exec();
 	}
@@ -54,39 +57,6 @@ public class Analyzer {
 	public void test() throws Exception {
 		new Analyzer().exec();
 	}
-
-	private void checkClassesHierarchy() {
-		final Class<?>[] classes = { XExpression.class, XBlockExpression.class, JvmTypeReference.class,
-				// XImportSection.class,
-				XAnnotation.class, JvmFormalParameter.class, XForLoopExpression.class, XStringLiteral.class,
-				XIfExpression.class };
-
-		for (int i = 0; i < classes.length; i++) {
-			for (int j = i + 1; j < classes.length; j++) {
-				new Analyzer().isParentOf(classes[i], classes[j]);
-			}
-		}
-	}
-
-	private void isParentOf(final Class<?> a, final Class<?> b) {
-		final boolean ab = a.isAssignableFrom(b);
-		final boolean ba = b.isAssignableFrom(a);
-
-		if (ab && ba) {
-			System.out.println(a.getName() + " and " + b.getName() + " are probably the same");
-		} else if (!ab && ba) {
-			System.out.println(a.getName() + " is a child of  " + b.getName());
-		} else if (ab && !ba) {
-			System.out.println(a.getName() + " is a parent of  " + b.getName());
-		} else {
-			// System.out.println(a.getName() + "and " + b.getName() + "are not of the same
-			// hierarchy");
-		}
-
-	}
-
-	@Inject
-	private Provider<ResourceSet> resourceSetProvider;
 
 	public void exec() throws IOException, SQLException {
 		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore");
@@ -98,13 +68,8 @@ public class Analyzer {
 
 		final EPackage epackage = (EPackage) resource.getContents().get(0);
 
-		final Set<EClass> visitedClasses = new HashSet<>();
-		final Set<EPackage> visitedPackages = new HashSet<>();
-		visitedPackages.add(epackage);
-		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-
-		// Produce a dependency graph of the targeted EPackage
-		epackage.getEClassifiers().forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
+		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new EcoreDependencyAnalyzer()
+				.ecoreDependencyAnalysis(epackage);
 
 		new EcoreCSVReport().produceEcoreCSV(graph);
 		new EcoreGraphvizReport().produceEcoreGraphviz(graph);
@@ -128,6 +93,23 @@ public class Analyzer {
 		};
 		set.getLoadOptions().put(XMLResource.OPTION_URI_HANDLER, handler);
 		return set;
+	}
+
+	private void isParentOf(final Class<?> a, final Class<?> b) {
+		final boolean ab = a.isAssignableFrom(b);
+		final boolean ba = b.isAssignableFrom(a);
+
+		if (ab && ba) {
+			System.out.println(a.getName() + " and " + b.getName() + " are probably the same");
+		} else if (!ab && ba) {
+			System.out.println(a.getName() + " is a child of  " + b.getName());
+		} else if (ab && !ba) {
+			System.out.println(a.getName() + " is a parent of  " + b.getName());
+		} else {
+			// System.out.println(a.getName() + "and " + b.getName() + "are not of the same
+			// hierarchy");
+		}
+
 	}
 
 	private void xtextAnalysis(final String file) throws IOException {
@@ -194,5 +176,18 @@ public class Analyzer {
 
 	private static String generateEcoreName(final EClass c) {
 		return "ecore_" + c.getEPackage().getName() + "_" + c.getName();
+	}
+
+	private void checkClassesHierarchy() {
+		final Class<?>[] classes = { XExpression.class, XBlockExpression.class, JvmTypeReference.class,
+				// XImportSection.class,
+				XAnnotation.class, JvmFormalParameter.class, XForLoopExpression.class, XStringLiteral.class,
+				XIfExpression.class };
+
+		for (int i = 0; i < classes.length; i++) {
+			for (int j = i + 1; j < classes.length; j++) {
+				new Analyzer().isParentOf(classes[i], classes[j]);
+			}
+		}
 	}
 }
