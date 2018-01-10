@@ -41,9 +41,9 @@ import org.supercsv.prefs.CsvPreference;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import xbase.reports.EcoreCSVReport;
-import xbase.reports.EcoreGraphvizReport;
-import xbase.reports.EcoreSqliteReport;
+import xbase_analyzer.reports.EcoreCSVReport;
+import xbase_analyzer.reports.EcoreGraphvizReport;
+import xbase_analyzer.reports.EcoreSqliteReport;
 
 public class Analyzer {
 	public static void main(final String[] args) throws Exception {

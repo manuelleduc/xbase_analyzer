@@ -1,4 +1,4 @@
-package xbase.reports;
+package xbase_analyzer.reports;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
