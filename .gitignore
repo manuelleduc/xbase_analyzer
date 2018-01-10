@@ -1,0 +1,7 @@
+*.log
+*.csv
+*.dot
+/bin
+/mvn
+/target
+*.~lock.*.csv#

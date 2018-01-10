@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: xbase_analyzer
+Bundle-SymbolicName: xbase_analyzer
+Bundle-Version: 1.0.0.qualifier
+Export-Package: xbase_analyzer
+Require-Bundle: org.eclipse.xtext.xbase,
+ org.eclipse.emf,
+ org.eclipse.emf.common,
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext,
+ org.junit
+Bundle-ClassPath: mvn/net.sf.supercsv.super-csv-2.4.0.jar,
+ .,
+ mvn/org.jgrapht.jgrapht-core-1.1.0.jar
