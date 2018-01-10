@@ -5,3 +5,5 @@
 /mvn
 /target
 *.~lock.*.csv#
+*.db
+*.svg
