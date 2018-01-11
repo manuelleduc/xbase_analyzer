@@ -1,10 +1,14 @@
 package xbase_analyzer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,10 +21,17 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl;
+import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.AbstractMetamodelDeclaration;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Grammar;
+import org.eclipse.xtext.GrammarToDot;
+import org.eclipse.xtext.GrammarUtil;
+import org.eclipse.xtext.ParserRule;
+import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.common.types.JvmFormalParameter;
 import org.eclipse.xtext.common.types.JvmTypeReference;
@@ -36,6 +47,7 @@ import org.eclipse.xtext.xtype.XtypePackage;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.junit.Test;
+import org.sqlite.util.StringUtils;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
@@ -52,6 +64,9 @@ public class Analyzer {
 
 	@Inject
 	private Provider<ResourceSet> resourceSetProvider;
+	//
+	// @Inject
+	// private DebugGraphGenerator debugGraphGenerator;
 
 	public static void main(final String[] args) throws Exception {
 		new Analyzer().exec();
@@ -63,16 +78,22 @@ public class Analyzer {
 	}
 
 	public void exec() throws IOException, SQLException {
-		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
-				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
-				"/org.xtext.httprouting/model/generated/Route.ecore",
-				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
-				"/org.xtext.scripting/model/generated/Scripting.ecore",
-				"/org.xtext.template/model/generated/Template.ecore",
-				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
+		// this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+		// "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+		// "/org.xtext.httprouting/model/generated/Route.ecore",
+		// "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+		// "/org.xtext.scripting/model/generated/Scripting.ecore",
+		// "/org.xtext.template/model/generated/Template.ecore",
+		// "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
 		// this.xtextAnalysis(
 		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
+
+		this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
 	}
 
 	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {
@@ -94,7 +115,11 @@ public class Analyzer {
 
 	private ResourceSet initResourceSet() {
 		final ResourceSet set = new XtextResourceSet();
+		attachHandler(set);
+		return set;
+	}
 
+	private void attachHandler(final ResourceSet set) {
 		final URIHandlerImpl handler = new org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl() {
 
 			@Override
@@ -107,7 +132,6 @@ public class Analyzer {
 
 		};
 		set.getLoadOptions().put(XMLResource.OPTION_URI_HANDLER, handler);
-		return set;
 	}
 
 	private void isParentOf(final Class<?> a, final Class<?> b) {
@@ -127,16 +151,105 @@ public class Analyzer {
 
 	}
 
-	private void xtextAnalysis(final String path) throws IOException {
+	private void xtextAnalysis(final String path, final String... paths) throws IOException {
 
 		final Injector injector = new XtextStandaloneSetup().createInjectorAndDoEMFRegistration();
 		injector.injectMembers(this);
 
 		final ResourceSet set = resourceSetProvider.get();
+		attachHandler(set);
 		final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
+
+		for (final String tmp : paths) {
+			set.getResource(URI.createPlatformPluginURI(tmp, false), true);
+		}
 
 		final Grammar grammar = (Grammar) resource.getContents().get(0);
 
+		for (final Grammar grammar2 : grammar.getUsedGrammars()) {
+			System.out.println(grammar2.getName());
+		}
+
+		// final List<ParserRule> parserRules = GrammarUtil.allParserRules(grammar);
+		//
+		// System.out.println("All parser rules");
+		// System.out.println(
+		// parserRules.stream().map(ParserRule::toString).collect(Collectors.joining(System.lineSeparator())));
+		//
+		// System.out.println(System.lineSeparator());
+		// System.out.println("All rules");
+		// final List<AbstractRule> allRules = GrammarUtil.allRules(grammar);
+		// System.out.println(
+		// allRules.stream().map(AbstractRule::toString).collect(Collectors.joining(System.lineSeparator())));
+		//
+		// System.out.println(System.lineSeparator());
+		// System.out.println("All alternatives");
+		//
+		// final Collection<? extends AbstractElement> allAlternatives =
+		// GrammarUtil.getAllAlternatives(grammar);
+		// System.out.println(allAlternatives.stream().map(x -> {
+		// return x.toString() + " ==> " + x.eContainer().toString();
+		// }).collect(Collectors.joining(System.lineSeparator())));
+
+		// Iterable<Pair<String, String>> draw =
+		// debugGraphGenerator.generateDebugGraphs();
+
+		final GrammarToDot g2t = new GrammarToDot();
+		EcoreUtil.resolveAll(set);
+
+		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("BuildDSL.dot")));
+
+		final String dot = g2t.draw(grammar);
+		bufferedWriter.write(dot);
+
+		bufferedWriter.close();
+
+		final List<AbstractRule> rules = GrammarUtil.allRules(grammar);
+		for (final AbstractRule rule : rules) {
+			System.out.println("rule " + rule.getName());
+			final AbstractElement alternatives = rule.getAlternatives();
+			visitAbstractElement(alternatives);
+		}
+		// rules.getAlternatives()
+
+		// grammar.eAllContents().forEachRemaining(new Consumer<EObject>() {
+		//
+		// @Override
+		// public void accept(EObject t) {
+		// if(t instanceof ParserRule) {
+		// ParserRule pr = (ParserRule) t;
+		// System.out.println(pr.getName());
+		// }
+		// }
+		// });
+
+		for (final ParserRule pr : GrammarUtil.allParserRules(grammar)) {
+			System.out.println(pr.getName() + ": " + pr.getType().getClassifier().getName());
+		}
+
+		// System.out.println();
+
+		final EList<AbstractMetamodelDeclaration> metamodelDeclarations = grammar.getMetamodelDeclarations();
+
+		System.out.println(metamodelDeclarations.stream().map(Object::toString)
+				.collect(Collectors.joining(System.lineSeparator())));
+
+		// xtextCSV(grammar);
+	}
+
+	private void visitAbstractElement(final AbstractElement abstractElement) {
+		if (abstractElement instanceof RuleCall) {
+			final RuleCall rc = (RuleCall) abstractElement;
+			System.out.println("- " + rc.getRule().getName());
+		}
+		final List<AbstractElement> collect = abstractElement.eContents().stream()
+				.filter(x -> x instanceof AbstractElement).map(x -> (AbstractElement) x).collect(Collectors.toList());
+		for (final AbstractElement ae : collect) {
+			visitAbstractElement(ae);
+		}
+	}
+
+	private void xtextCSV(final Grammar grammar) throws IOException {
 		final CsvListWriter csvWriter = new CsvListWriter(new OutputStreamWriter(System.out),
 				CsvPreference.STANDARD_PREFERENCE);
 
