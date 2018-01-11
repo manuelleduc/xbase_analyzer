@@ -39,8 +39,8 @@ public class EcoreCSVReport {
 				line.add(new EClassToString().apply(c1));
 				sorted.forEach(c2 -> {
 
-					final GraphPath<EClass, DefaultEdge> dst = dsp.getPath(c1, c2);
-					final String cell = Optional.ofNullable(dst).map(x -> String.valueOf(x.getLength())).orElse("");
+					final GraphPath<EClass, DefaultEdge> graphPath = dsp.getPath(c1, c2);
+					final String cell = Optional.ofNullable(graphPath).map(x -> String.valueOf(x.getLength())).orElse("");
 					line.add(cell);
 				});
 

@@ -1,12 +1,15 @@
 package xbase_analyzer;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Grammar;
+
+import xbase_analyzer.utils.xtext.XtextUtil;
 
 public final class AbstractRuleToString {
 
 	private final String separator;
+	
+	private final XtextUtil xtextUtil = new XtextUtil();
 
 	public AbstractRuleToString(final String separator) {
 		this.separator = separator;
@@ -19,16 +22,10 @@ public final class AbstractRuleToString {
 	public String apply(final AbstractRule abstractRule) {
 		final StringBuilder sb = new StringBuilder();
 
-		EObject eContainer = abstractRule.eContainer();
-		while (!(eContainer instanceof Grammar)) {
-			eContainer = eContainer.eContainer();
-		}
-
-		final Grammar grammar = (Grammar) eContainer;
+		final Grammar grammar = xtextUtil.lookupGrammar(abstractRule);
 		sb.append(grammar.getName().replaceAll("\\.", this.separator));
 		sb.append(this.separator);
 		sb.append(abstractRule.getName());
 		return sb.toString();
 	}
-
 }

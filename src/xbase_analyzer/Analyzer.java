@@ -43,6 +43,8 @@ import org.eclipse.xtext.xbase.XStringLiteral;
 import org.eclipse.xtext.xbase.XbasePackage;
 import org.eclipse.xtext.xbase.annotations.xAnnotations.XAnnotation;
 import org.eclipse.xtext.xtype.XtypePackage;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.junit.Test;
@@ -57,14 +59,13 @@ import xbase_analyzer.analyzer.EcoreDependencyAnalyzer;
 import xbase_analyzer.reports.EcoreCSVReport;
 import xbase_analyzer.reports.EcoreGraphvizReport;
 import xbase_analyzer.reports.EcoreSqliteReport;
+import xbase_analyzer.utils.xtext.XtextUtil;
 
 public class Analyzer {
 
 	@Inject
 	private Provider<ResourceSet> resourceSetProvider;
-	//
-	// @Inject
-	// private DebugGraphGenerator debugGraphGenerator;
+	private final XtextUtil xtextUtil = new XtextUtil();
 
 	public static void main(final String[] args) throws Exception {
 		new Analyzer().exec();
@@ -195,11 +196,11 @@ public class Analyzer {
 	 */
 	private void xtextAnalysis(final String path, final String... paths) throws IOException {
 
-		/* TODO : 
-		overloading of production rules (by inheritence).
-		relation between xtext and ecore.
-		*/
-		
+		/*
+		 * TODO : overloading of production rules (by inheritence). relation between
+		 * xtext and ecore.
+		 */
+
 		final Grammar grammar = loadXtextGrammar(path, paths);
 
 		xtextGrammarToDotFile(grammar);
@@ -225,6 +226,23 @@ public class Analyzer {
 		// xtextCSV(grammar);
 
 		new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
+
+		final DijkstraShortestPath<AbstractRule, DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
+
+		rules.stream().filter(r -> {
+			final Grammar g = xtextUtil.lookupGrammar(r);
+			return g == grammar;
+		}).forEach(ar1 -> {
+			rules.forEach(ar2 -> {
+				if (graph.containsVertex(ar1) && graph.containsVertex(ar2)) {
+					final GraphPath<AbstractRule, DefaultEdge> graphPath = dsp.getPath(ar1, ar2);
+					final Integer cell = Optional.ofNullable(graphPath).map(x -> x.getLength()).orElse(null);
+					if (cell != null && cell > 0) {
+						System.out.println(ar1 + " -> " + ar2 + " = " + cell);
+					}
+				}
+			});
+		});
 
 	}
 
@@ -255,8 +273,8 @@ public class Analyzer {
 		return grammar;
 	}
 
-	private void visitAbstractElement(final AbstractElement abstractElement, AbstractRule root,
-			DefaultDirectedGraph<AbstractRule, DefaultEdge> graph) {
+	private void visitAbstractElement(final AbstractElement abstractElement, final AbstractRule root,
+			final DefaultDirectedGraph<AbstractRule, DefaultEdge> graph) {
 		if (abstractElement instanceof RuleCall) {
 			final RuleCall rc = (RuleCall) abstractElement;
 			final AbstractRule rule = rc.getRule();
