@@ -10,7 +10,8 @@ import org.jgrapht.graph.DefaultEdge;
 
 public class XtextGraphvizReport {
 
-	public void produceXtextGraphviz(DefaultDirectedGraph<AbstractRule, DefaultEdge> graph) throws IOException {
+	public void produceXtextGraphviz(String name, DefaultDirectedGraph<AbstractRule, DefaultEdge> graph)
+			throws IOException {
 		final String nl = System.lineSeparator();
 		final StringBuilder sb = new StringBuilder();
 		sb.append("digraph {");
@@ -38,7 +39,7 @@ public class XtextGraphvizReport {
 		sb.append(nl);
 		sb.append("}");
 
-		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("result_xtext.dot"));
+		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("result_xtext_" + name + ".dot"));
 
 		bufferedWriter.write(sb.toString());
 

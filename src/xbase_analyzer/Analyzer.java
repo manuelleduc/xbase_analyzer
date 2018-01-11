@@ -84,10 +84,44 @@ public class Analyzer {
 				"/org.xtext.scripting/model/generated/Scripting.ecore",
 				"/org.xtext.template/model/generated/Template.ecore",
 				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
-		this.xtextAnalysis(
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
+		// this.xtextAnalysis(
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
 
+		// BuildDSL
 		this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// GuiceModules
+		this.xtextAnalysis("/org.xtext.guicemodules/src/org/xtext/guicemodules/GuiceModules.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// Route
+		this.xtextAnalysis("/org.xtext.httprouting/src/org/xtext/httprouting/Route.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// MongoBeans
+		this.xtextAnalysis("/org.xtext.mongobeans/src/org/xtext/mongobeans/MongoBeans.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// Scripting
+		this.xtextAnalysis("/org.xtext.scripting/src/org/xtext/scripting/Scripting.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// Template
+		this.xtextAnalysis("/org.xtext.template/src/org/xtext/template/Template.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// TortoiseShell
+		this.xtextAnalysis("/org.xtext.tortoiseshell/src/org/xtext/tortoiseshell/TortoiseShell.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
 
@@ -161,6 +195,11 @@ public class Analyzer {
 	 */
 	private void xtextAnalysis(final String path, final String... paths) throws IOException {
 
+		/* TODO : 
+		overloading of production rules (by inheritence).
+		relation between xtext and ecore.
+		*/
+		
 		final Grammar grammar = loadXtextGrammar(path, paths);
 
 		xtextGrammarToDotFile(grammar);
@@ -185,14 +224,14 @@ public class Analyzer {
 
 		// xtextCSV(grammar);
 
-		new XtextGraphvizReport().produceXtextGraphviz(graph);
+		new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
 
 	}
 
 	private void xtextGrammarToDotFile(final Grammar grammar) throws IOException {
 		final GrammarToDot g2t = new GrammarToDot();
 
-		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("BuildDSL.dot")));
+		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(grammar.getName() + ".dot")));
 
 		final String dot = g2t.draw(grammar);
 		bufferedWriter.write(dot);
