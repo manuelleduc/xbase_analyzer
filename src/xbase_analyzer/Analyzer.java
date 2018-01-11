@@ -21,7 +21,6 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl;
 import org.eclipse.xtext.AbstractElement;
@@ -47,7 +46,6 @@ import org.eclipse.xtext.xtype.XtypePackage;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.junit.Test;
-import org.sqlite.util.StringUtils;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
@@ -78,17 +76,16 @@ public class Analyzer {
 	}
 
 	public void exec() throws IOException, SQLException {
-		// this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-		// "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
-		// "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
-		// "/org.xtext.httprouting/model/generated/Route.ecore",
-		// "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
-		// "/org.xtext.scripting/model/generated/Scripting.ecore",
-		// "/org.xtext.template/model/generated/Template.ecore",
-		// "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
-		// this.xtextAnalysis(
-		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
+		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+				"/org.xtext.httprouting/model/generated/Route.ecore",
+				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+				"/org.xtext.scripting/model/generated/Scripting.ecore",
+				"/org.xtext.template/model/generated/Template.ecore",
+				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
+		this.xtextAnalysis(
+				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
 
 		this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
@@ -151,8 +148,59 @@ public class Analyzer {
 
 	}
 
+	/**
+	 * Execute the analysis of xtext specifications.
+	 * 
+	 * @param path
+	 *            the path to the main Xtext file.
+	 * @param paths
+	 *            The path to the references Xtext files (needed because automatic
+	 *            resolutions of referenced Xtext file does not work for some
+	 *            reason).
+	 * @throws IOException
+	 */
 	private void xtextAnalysis(final String path, final String... paths) throws IOException {
 
+		final Grammar grammar = loadXtextGrammar(path, paths);
+
+		xtextGrammarToDotFile(grammar);
+
+		final DefaultDirectedGraph<AbstractRule, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+
+		final List<AbstractRule> rules = GrammarUtil.allRules(grammar);
+		for (final AbstractRule rule : rules) {
+			final AbstractElement alternatives = rule.getAlternatives();
+			visitAbstractElement(alternatives, rule, graph);
+		}
+		// for (final ParserRule pr : GrammarUtil.allParserRules(grammar)) {
+		// System.out.println(pr.getName() + ": " +
+		// pr.getType().getClassifier().getName());
+		// }
+
+		// final EList<AbstractMetamodelDeclaration> metamodelDeclarations =
+		// grammar.getMetamodelDeclarations();
+
+		// System.out.println(metamodelDeclarations.stream().map(Object::toString)
+		// .collect(Collectors.joining(System.lineSeparator())));
+
+		// xtextCSV(grammar);
+
+		new XtextGraphvizReport().produceXtextGraphviz(graph);
+
+	}
+
+	private void xtextGrammarToDotFile(final Grammar grammar) throws IOException {
+		final GrammarToDot g2t = new GrammarToDot();
+
+		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("BuildDSL.dot")));
+
+		final String dot = g2t.draw(grammar);
+		bufferedWriter.write(dot);
+
+		bufferedWriter.close();
+	}
+
+	private Grammar loadXtextGrammar(final String path, final String... paths) {
 		final Injector injector = new XtextStandaloneSetup().createInjectorAndDoEMFRegistration();
 		injector.injectMembers(this);
 
@@ -165,87 +213,25 @@ public class Analyzer {
 		}
 
 		final Grammar grammar = (Grammar) resource.getContents().get(0);
-
-		for (final Grammar grammar2 : grammar.getUsedGrammars()) {
-			System.out.println(grammar2.getName());
-		}
-
-		// final List<ParserRule> parserRules = GrammarUtil.allParserRules(grammar);
-		//
-		// System.out.println("All parser rules");
-		// System.out.println(
-		// parserRules.stream().map(ParserRule::toString).collect(Collectors.joining(System.lineSeparator())));
-		//
-		// System.out.println(System.lineSeparator());
-		// System.out.println("All rules");
-		// final List<AbstractRule> allRules = GrammarUtil.allRules(grammar);
-		// System.out.println(
-		// allRules.stream().map(AbstractRule::toString).collect(Collectors.joining(System.lineSeparator())));
-		//
-		// System.out.println(System.lineSeparator());
-		// System.out.println("All alternatives");
-		//
-		// final Collection<? extends AbstractElement> allAlternatives =
-		// GrammarUtil.getAllAlternatives(grammar);
-		// System.out.println(allAlternatives.stream().map(x -> {
-		// return x.toString() + " ==> " + x.eContainer().toString();
-		// }).collect(Collectors.joining(System.lineSeparator())));
-
-		// Iterable<Pair<String, String>> draw =
-		// debugGraphGenerator.generateDebugGraphs();
-
-		final GrammarToDot g2t = new GrammarToDot();
-		EcoreUtil.resolveAll(set);
-
-		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("BuildDSL.dot")));
-
-		final String dot = g2t.draw(grammar);
-		bufferedWriter.write(dot);
-
-		bufferedWriter.close();
-
-		final List<AbstractRule> rules = GrammarUtil.allRules(grammar);
-		for (final AbstractRule rule : rules) {
-			System.out.println("rule " + rule.getName());
-			final AbstractElement alternatives = rule.getAlternatives();
-			visitAbstractElement(alternatives);
-		}
-		// rules.getAlternatives()
-
-		// grammar.eAllContents().forEachRemaining(new Consumer<EObject>() {
-		//
-		// @Override
-		// public void accept(EObject t) {
-		// if(t instanceof ParserRule) {
-		// ParserRule pr = (ParserRule) t;
-		// System.out.println(pr.getName());
-		// }
-		// }
-		// });
-
-		for (final ParserRule pr : GrammarUtil.allParserRules(grammar)) {
-			System.out.println(pr.getName() + ": " + pr.getType().getClassifier().getName());
-		}
-
-		// System.out.println();
-
-		final EList<AbstractMetamodelDeclaration> metamodelDeclarations = grammar.getMetamodelDeclarations();
-
-		System.out.println(metamodelDeclarations.stream().map(Object::toString)
-				.collect(Collectors.joining(System.lineSeparator())));
-
-		// xtextCSV(grammar);
+		return grammar;
 	}
 
-	private void visitAbstractElement(final AbstractElement abstractElement) {
+	private void visitAbstractElement(final AbstractElement abstractElement, AbstractRule root,
+			DefaultDirectedGraph<AbstractRule, DefaultEdge> graph) {
 		if (abstractElement instanceof RuleCall) {
 			final RuleCall rc = (RuleCall) abstractElement;
-			System.out.println("- " + rc.getRule().getName());
+			final AbstractRule rule = rc.getRule();
+
+			if (!graph.containsVertex(root))
+				graph.addVertex(root);
+			if (!graph.containsVertex(rule))
+				graph.addVertex(rule);
+			graph.addEdge(root, rule);
 		}
 		final List<AbstractElement> collect = abstractElement.eContents().stream()
 				.filter(x -> x instanceof AbstractElement).map(x -> (AbstractElement) x).collect(Collectors.toList());
 		for (final AbstractElement ae : collect) {
-			visitAbstractElement(ae);
+			visitAbstractElement(ae, root, graph);
 		}
 	}
 

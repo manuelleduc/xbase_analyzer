@@ -31,7 +31,7 @@ public class EcoreGraphvizReport {
 		sb.append(nl);
 		sb.append("}");
 
-		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("result.dot"));
+		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("result_ecore.dot"));
 
 		bufferedWriter.write(sb.toString());
 
