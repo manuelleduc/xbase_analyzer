@@ -24,12 +24,10 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl;
 import org.eclipse.xtext.AbstractElement;
-import org.eclipse.xtext.AbstractMetamodelDeclaration;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarToDot;
 import org.eclipse.xtext.GrammarUtil;
-import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.common.types.JvmFormalParameter;
@@ -59,13 +57,13 @@ import xbase_analyzer.analyzer.EcoreDependencyAnalyzer;
 import xbase_analyzer.reports.EcoreCSVReport;
 import xbase_analyzer.reports.EcoreGraphvizReport;
 import xbase_analyzer.reports.EcoreSqliteReport;
+import xbase_analyzer.reports.XtextSqliteReport;
 import xbase_analyzer.utils.xtext.XtextUtil;
 
 public class Analyzer {
 
 	@Inject
 	private Provider<ResourceSet> resourceSetProvider;
-	private final XtextUtil xtextUtil = new XtextUtil();
 
 	public static void main(final String[] args) throws Exception {
 		new Analyzer().exec();
@@ -193,8 +191,9 @@ public class Analyzer {
 	 *            resolutions of referenced Xtext file does not work for some
 	 *            reason).
 	 * @throws IOException
+	 * @throws SQLException
 	 */
-	private void xtextAnalysis(final String path, final String... paths) throws IOException {
+	private void xtextAnalysis(final String path, final String... paths) throws IOException, SQLException {
 
 		/*
 		 * TODO : overloading of production rules (by inheritence). relation between
@@ -227,22 +226,7 @@ public class Analyzer {
 
 		new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
 
-		final DijkstraShortestPath<AbstractRule, DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
-
-		rules.stream().filter(r -> {
-			final Grammar g = xtextUtil.lookupGrammar(r);
-			return g == grammar;
-		}).forEach(ar1 -> {
-			rules.forEach(ar2 -> {
-				if (graph.containsVertex(ar1) && graph.containsVertex(ar2)) {
-					final GraphPath<AbstractRule, DefaultEdge> graphPath = dsp.getPath(ar1, ar2);
-					final Integer cell = Optional.ofNullable(graphPath).map(x -> x.getLength()).orElse(null);
-					if (cell != null && cell > 0) {
-						System.out.println(ar1 + " -> " + ar2 + " = " + cell);
-					}
-				}
-			});
-		});
+		new XtextSqliteReport().xtextDependencyDB(grammar, graph, rules);
 
 	}
 

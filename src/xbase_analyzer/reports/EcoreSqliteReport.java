@@ -1,8 +1,6 @@
 package xbase_analyzer.reports;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -23,20 +21,17 @@ import xbase_analyzer.utils.ecore.EClassToString;
 
 public class EcoreSqliteReport {
 
-	private void cleanupEcoreSqlite() throws IOException {
-		final File file = new File("result.db");
-		if (file.exists()) {
-			Files.delete(file.toPath());
-		}
+	private void cleanupEcoreSqlite(Statement statement) throws IOException, SQLException {
+		statement.execute("DELETE FROM dependencies");
+		statement.execute("DELETE FROM eclass");
 	}
 
 	public void produceEcoreSqlite(final DefaultDirectedGraph<EClass, DefaultEdge> graph)
 			throws SQLException, IOException {
-		cleanupEcoreSqlite();
 		final Connection connection = DriverManager.getConnection("jdbc:sqlite:result.db");
 		final Statement statement = connection.createStatement();
-		statement.execute("CREATE TABLE dependencies (pkgSrc TEXT, src TEXT, pkdDst TEXT, dst TEXT, lgt NUMERIC)");
-		statement.execute("CREATE TABLE eclass (name TEXT, epackage TEXT)");
+		initializeDatabase(statement);
+		cleanupEcoreSqlite(statement);
 
 		final List<EClass> sorted = graph.vertexSet().stream().sorted(new EClassNameComparator())
 				.collect(Collectors.toList());
@@ -81,6 +76,12 @@ public class EcoreSqliteReport {
 
 		connection.close();
 
+	}
+
+	private void initializeDatabase(final Statement statement) throws SQLException {
+		statement.execute(
+				"CREATE TABLE IF NOT EXISTS dependencies (pkgSrc TEXT, src TEXT, pkgDst TEXT, dst TEXT, distance NUMERIC)");
+		statement.execute("CREATE TABLE IF NOT EXISTS eclass (name TEXT, epackage TEXT)");
 	}
 
 }
