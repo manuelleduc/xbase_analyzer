@@ -23,7 +23,7 @@ public class EcoreCSVReport {
 	public void produceEcoreCSV(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
 		try {
 			final CsvListWriter csv = new CsvListWriter(new FileWriter(new File("results.csv")),
-					CsvPreference.STANDARD_PREFERENCE);
+					CsvPreference.EXCEL_PREFERENCE);
 
 			final List<String> headers = buildCSVHeader(graph);
 			csv.writeHeader(headers.toArray(new String[headers.size()]));

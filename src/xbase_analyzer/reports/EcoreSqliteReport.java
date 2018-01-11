@@ -51,11 +51,9 @@ public class EcoreSqliteReport {
 			final String c1EPackageName = c1.getEPackage().getName();
 			final String c1Name = c1.getName();
 			try {
-				final String sql = "INSERT INTO eclass(epackage, name) SELECT \"" + c1EPackageName + "\", \"" + c1Name
+				statement.execute("INSERT INTO eclass(epackage, name) SELECT \"" + c1EPackageName + "\", \"" + c1Name
 						+ "\" WHERE NOT EXISTS (SELECT 1 FROM eclass WHERE epackage = \"" + c1EPackageName
-						+ "\" and name = \"" + c1Name + "\")";
-				System.out.println(sql);
-				statement.execute(sql);
+						+ "\" and name = \"" + c1Name + "\")");
 			} catch (final SQLException e1) {
 				e1.printStackTrace();
 			}

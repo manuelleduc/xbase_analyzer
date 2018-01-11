@@ -21,6 +21,7 @@ import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Grammar;
+import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.common.types.JvmFormalParameter;
 import org.eclipse.xtext.common.types.JvmTypeReference;
 import org.eclipse.xtext.resource.XtextResourceSet;
@@ -39,6 +40,7 @@ import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Provider;
 
 import xbase_analyzer.analyzer.EcoreDependencyAnalyzer;
@@ -62,7 +64,15 @@ public class Analyzer {
 
 	public void exec() throws IOException, SQLException {
 		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.xbase/model/Xtype.ecore");
+				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+				"/org.xtext.httprouting/model/generated/Route.ecore",
+				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+				"/org.xtext.scripting/model/generated/Scripting.ecore",
+				"/org.xtext.template/model/generated/Template.ecore",
+				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
+		// this.xtextAnalysis(
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
 	}
 
 	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {
@@ -117,14 +127,18 @@ public class Analyzer {
 
 	}
 
-	private void xtextAnalysis(final String file) throws IOException {
+	private void xtextAnalysis(final String path) throws IOException {
+
+		final Injector injector = new XtextStandaloneSetup().createInjectorAndDoEMFRegistration();
+		injector.injectMembers(this);
+
 		final ResourceSet set = resourceSetProvider.get();
-		final Resource resource = set.getResource(URI.createFileURI(file), true);
+		final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
 
 		final Grammar grammar = (Grammar) resource.getContents().get(0);
 
 		final CsvListWriter csvWriter = new CsvListWriter(new OutputStreamWriter(System.out),
-				CsvPreference.EXCEL_PREFERENCE);
+				CsvPreference.STANDARD_PREFERENCE);
 
 		csvWriter.writeHeader("grammar", "Rule", "Type");
 
