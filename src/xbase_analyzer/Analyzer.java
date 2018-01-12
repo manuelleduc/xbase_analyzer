@@ -41,8 +41,6 @@ import org.eclipse.xtext.xbase.XStringLiteral;
 import org.eclipse.xtext.xbase.XbasePackage;
 import org.eclipse.xtext.xbase.annotations.xAnnotations.XAnnotation;
 import org.eclipse.xtext.xtype.XtypePackage;
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.junit.Test;
@@ -57,8 +55,8 @@ import xbase_analyzer.analyzer.EcoreDependencyAnalyzer;
 import xbase_analyzer.reports.EcoreCSVReport;
 import xbase_analyzer.reports.EcoreGraphvizReport;
 import xbase_analyzer.reports.EcoreSqliteReport;
+import xbase_analyzer.reports.XtextNeo4jReport;
 import xbase_analyzer.reports.XtextSqliteReport;
-import xbase_analyzer.utils.xtext.XtextUtil;
 
 public class Analyzer {
 
@@ -87,6 +85,14 @@ public class Analyzer {
 		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
 
 		// BuildDSL
+		xtextAnalysis();
+
+	}
+
+	private void xtextAnalysis() throws IOException, SQLException {
+		
+		new XtextSqliteReport().init();
+		
 		this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
@@ -123,7 +129,6 @@ public class Analyzer {
 		this.xtextAnalysis("/org.xtext.tortoiseshell/src/org/xtext/tortoiseshell/TortoiseShell.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
 	}
 
 	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {
@@ -227,6 +232,7 @@ public class Analyzer {
 		new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
 
 		new XtextSqliteReport().xtextDependencyDB(grammar, graph, rules);
+		new XtextNeo4jReport().produce(grammar);
 
 	}
 

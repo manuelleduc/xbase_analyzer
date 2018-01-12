@@ -1,4 +1,4 @@
-package xbase_analyzer.reports;
+package xbase_analyzer.reports.executable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,14 +26,15 @@ public class PackageDependenciesReport {
 		final Connection connection = DriverManager.getConnection("jdbc:sqlite:result.db");
 		final Statement statement = connection.createStatement();
 
-		final ResultSet rs = statement.executeQuery("SELECT DISTINCT pkgSrc, pkdDst, count(*) " + "FROM dependencies "
-				+ "where pkdDst <> dependencies.pkgSrc and lgt = 1 " + "GROUP BY pkgSrc, pkdDst");
+		final ResultSet rs = statement.executeQuery("SELECT DISTINCT pkgSrc, pkgDst, count(*) " + "FROM dependencies "
+				+ "where pkgDst <> dependencies.pkgSrc and lgt = 1 " + "GROUP BY pkgSrc, pkgDst");
 
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append("digraph {");
 		sb.append(nl);
 		while (rs.next()) {
+			
 			final String column1 = rs.getString(1);
 			final String column2 = rs.getString(2);
 			final int column3 = rs.getInt(3);
