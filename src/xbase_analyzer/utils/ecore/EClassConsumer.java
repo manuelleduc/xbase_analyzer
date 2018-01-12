@@ -13,10 +13,10 @@ import org.jgrapht.graph.DefaultEdge;
 public final class EClassConsumer implements Consumer<EClassifier> {
 	private final Set<EClass> visitedClasses;
 	private final Set<EPackage> visitedPackages;
-	private final DefaultDirectedGraph<EClass, DefaultEdge> graph;
+	private final DefaultDirectedGraph<EClass, NamedEdge> graph;
 
 	public EClassConsumer(final Set<EClass> visitedClasses, final Set<EPackage> visitedPackages,
-			final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
+			final DefaultDirectedGraph<EClass, NamedEdge> graph) {
 		this.visitedClasses = visitedClasses;
 		this.visitedPackages = visitedPackages;
 		this.graph = graph;
@@ -32,14 +32,14 @@ public final class EClassConsumer implements Consumer<EClassifier> {
 				final EList<EClass> eSuperTypes = cls.getESuperTypes();
 				eSuperTypes.forEach(pc -> {
 					registerClass(pc);
-					graph.addEdge(cls, pc);
+					graph.addEdge(cls, pc, new InheritenceEdge());
 				});
 				eSuperTypes.forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
 
 				cls.getEAllReferences().stream().filter(r -> r.getEType() instanceof EClass).map(r -> {
 					final EClass eType = (EClass) r.getEType();
 					registerClass(eType);
-					graph.addEdge(cls, eType);
+					graph.addEdge(cls, eType, new ReferenceEdge());
 					return eType;
 				}).forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
 			}

@@ -54,9 +54,11 @@ import com.google.inject.Provider;
 import xbase_analyzer.analyzer.EcoreDependencyAnalyzer;
 import xbase_analyzer.reports.EcoreCSVReport;
 import xbase_analyzer.reports.EcoreGraphvizReport;
+import xbase_analyzer.reports.EcoreNeo4jReport;
 import xbase_analyzer.reports.EcoreSqliteReport;
 import xbase_analyzer.reports.XtextNeo4jReport;
 import xbase_analyzer.reports.XtextSqliteReport;
+import xbase_analyzer.utils.ecore.NamedEdge;
 
 public class Analyzer {
 
@@ -73,17 +75,18 @@ public class Analyzer {
 	}
 
 	public void exec() throws IOException, SQLException {
-		// this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-		// "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
-		// "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
-		// "/org.xtext.httprouting/model/generated/Route.ecore",
-		// "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
-		// "/org.xtext.scripting/model/generated/Scripting.ecore",
-		// "/org.xtext.template/model/generated/Template.ecore",
-		// "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
-		// this.xtextAnalysis(
-		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
+		
+		
+		
+		 this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		 "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		 "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+		 "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+		 "/org.xtext.httprouting/model/generated/Route.ecore",
+		 "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+		 "/org.xtext.scripting/model/generated/Scripting.ecore",
+		 "/org.xtext.template/model/generated/Template.ecore",
+		 "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
 
 		// BuildDSL
 		xtextAnalysis();
@@ -135,7 +138,7 @@ public class Analyzer {
 
 	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {
 		final ResourceSet set = initResourceSet();
-		final DefaultDirectedGraph<EClass, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+		final DefaultDirectedGraph<EClass, NamedEdge> graph = new DefaultDirectedGraph<>(NamedEdge.class);
 		final Set<EClass> visitedClasses = new HashSet<>();
 		final Set<EPackage> visitedPackages = new HashSet<>();
 		for (final String path : paths) {
@@ -147,6 +150,7 @@ public class Analyzer {
 		new EcoreCSVReport().produceEcoreCSV(graph);
 		new EcoreGraphvizReport().produceEcoreGraphviz(graph);
 		new EcoreSqliteReport().produceEcoreSqlite(graph);
+		new EcoreNeo4jReport().produce(graph);
 
 	}
 

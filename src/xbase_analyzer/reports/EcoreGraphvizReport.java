@@ -6,13 +6,13 @@ import java.io.IOException;
 
 import org.eclipse.emf.ecore.EClass;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 
 import xbase_analyzer.utils.ecore.EClassToString;
+import xbase_analyzer.utils.ecore.NamedEdge;
 
 public class EcoreGraphvizReport {
 
-	public void produceEcoreGraphviz(final DefaultDirectedGraph<EClass, DefaultEdge> graph) throws IOException {
+	public void produceEcoreGraphviz(final DefaultDirectedGraph<EClass, NamedEdge> graph) throws IOException {
 		final String nl = System.lineSeparator();
 		final StringBuilder sb = new StringBuilder();
 		sb.append("digraph {");

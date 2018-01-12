@@ -8,10 +8,11 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import xbase_analyzer.utils.ecore.EClassConsumer;
+import xbase_analyzer.utils.ecore.NamedEdge;
 
 public class EcoreDependencyAnalyzer {
-	public DefaultDirectedGraph<EClass, DefaultEdge> ecoreDependencyAnalysis(final EPackage epackage,
-			final DefaultDirectedGraph<EClass, DefaultEdge> graph, final Set<EClass> visitedClasses,
+	public DefaultDirectedGraph<EClass, NamedEdge> ecoreDependencyAnalysis(final EPackage epackage,
+			final DefaultDirectedGraph<EClass, NamedEdge> graph, final Set<EClass> visitedClasses,
 			final Set<EPackage> visitedPackages) {
 		visitedPackages.add(epackage);
 

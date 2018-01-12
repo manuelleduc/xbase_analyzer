@@ -18,9 +18,10 @@ import org.supercsv.prefs.CsvPreference;
 
 import xbase_analyzer.utils.ecore.EClassNameComparator;
 import xbase_analyzer.utils.ecore.EClassToString;
+import xbase_analyzer.utils.ecore.NamedEdge;
 
 public class EcoreCSVReport {
-	public void produceEcoreCSV(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
+	public void produceEcoreCSV(final DefaultDirectedGraph<EClass, ? extends DefaultEdge> graph) {
 		try {
 			final CsvListWriter csv = new CsvListWriter(new FileWriter(new File("results.csv")),
 					CsvPreference.EXCEL_PREFERENCE);
@@ -28,7 +29,7 @@ public class EcoreCSVReport {
 			final List<String> headers = buildCSVHeader(graph);
 			csv.writeHeader(headers.toArray(new String[headers.size()]));
 
-			final DijkstraShortestPath<EClass, DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
+			final DijkstraShortestPath<EClass, ? extends DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
 
 			final List<EClass> sorted = graph.vertexSet().stream().sorted(new EClassNameComparator())
 					.collect(Collectors.toList());
@@ -39,8 +40,9 @@ public class EcoreCSVReport {
 				line.add(new EClassToString().apply(c1));
 				sorted.forEach(c2 -> {
 
-					final GraphPath<EClass, DefaultEdge> graphPath = dsp.getPath(c1, c2);
-					final String cell = Optional.ofNullable(graphPath).map(x -> String.valueOf(x.getLength())).orElse("");
+					final GraphPath<EClass, ? extends DefaultEdge> graphPath = dsp.getPath(c1, c2);
+					final String cell = Optional.ofNullable(graphPath).map(x -> String.valueOf(x.getLength()))
+							.orElse("");
 					line.add(cell);
 				});
 
@@ -57,7 +59,7 @@ public class EcoreCSVReport {
 		}
 	}
 
-	private List<String> buildCSVHeader(final DefaultDirectedGraph<EClass, DefaultEdge> graph) {
+	private List<String> buildCSVHeader(final DefaultDirectedGraph<EClass, ? extends DefaultEdge> graph) {
 		final List<String> headers = graph.vertexSet().stream().map(new EClassToString()).sorted()
 				.collect(Collectors.toList());
 

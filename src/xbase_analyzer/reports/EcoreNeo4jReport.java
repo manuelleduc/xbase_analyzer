@@ -2,8 +2,8 @@ package xbase_analyzer.reports;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
-import org.eclipse.xtext.AbstractRule;
-import org.eclipse.xtext.Grammar;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EPackage;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.neo4j.driver.v1.AuthTokens;
@@ -13,14 +13,12 @@ import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.TransactionWork;
 
-import xbase_analyzer.utils.xtext.XtextUtil;
+import xbase_analyzer.utils.ecore.NamedEdge;
 
-public class XtextNeo4jReport {
+public class EcoreNeo4jReport {
 
-	private final XtextUtil xtextUtil = new XtextUtil();
-
-	public void produce(final DefaultDirectedGraph<AbstractRule, DefaultEdge> graph) {
-
+	public void produce(final DefaultDirectedGraph<EClass, NamedEdge> graph) {
+		this.cleanup();
 		final String url = "bolt://localhost:7687";
 		final String user = "xbase";
 		final String password = "xbase";
@@ -28,36 +26,36 @@ public class XtextNeo4jReport {
 
 		try (Session session = driver.session()) {
 
-			for (final AbstractRule abstractRule : graph.vertexSet()) {
+			for (final EClass eClass : graph.vertexSet()) {
 
-				final Grammar grammar = xtextUtil.lookupGrammar(abstractRule);
+				final EPackage ePackage = eClass.getEPackage();
 
 				session.writeTransaction(new TransactionWork<String>() {
 
 					@Override
 					public String execute(final Transaction tx) {
-						tx.run("MERGE (a:Rule " + "{rule: $rule, grammar: $grammar})",
-								parameters("rule", abstractRule.getName(), "grammar", grammar.getName()));
+						tx.run("MERGE (a:EClass " + "{class: $class, package: $package})",
+								parameters("class", eClass.getName(), "package", ePackage.getName()));
 						return null;
 					}
 				});
 			}
 
-			for (final DefaultEdge edge : graph.edgeSet()) {
+			for (final NamedEdge edge : graph.edgeSet()) {
 
-				final AbstractRule rulea = graph.getEdgeSource(edge);
-				final Grammar grammara = xtextUtil.lookupGrammar(rulea);
-				final AbstractRule ruleb = graph.getEdgeTarget(edge);
-				final Grammar grammarb = xtextUtil.lookupGrammar(ruleb);
+				final EClass eClassA = graph.getEdgeSource(edge);
+				final EPackage ePackageA = eClassA.getEPackage();
+				final EClass eClassB = graph.getEdgeTarget(edge);
+				final EPackage ePackageB = eClassB.getEPackage();
 
 				session.writeTransaction(new TransactionWork<String>() {
 
 					@Override
 					public String execute(final Transaction tx) {
-						tx.run("MATCH (a:Rule {rule: $rulea, grammar: $grammara}), (b:Rule {rule: $ruleb, grammar: $grammarb}) "
-								+ "MERGE (a)-[:DEPENDS_OF]->(b)",
-								parameters("rulea", rulea.getName(), "grammara", grammara.getName(), "ruleb",
-										ruleb.getName(), "grammarb", grammarb.getName()));
+						tx.run("MATCH (a:EClass {class: $classa, package: $packagea}), (b:EClass {class: $classb, package: $packageb}) "
+								+ "MERGE (a)-[:" + edge.getName() + "]->(b)",
+								parameters("classa", eClassA.getName(), "packagea", ePackageA.getName(), "classb",
+										eClassB.getName(), "packageb", ePackageB.getName()));
 						return null;
 					}
 				});
@@ -77,7 +75,7 @@ public class XtextNeo4jReport {
 
 				@Override
 				public String execute(final Transaction tx) {
-					tx.run("MATCH (n:Rule) DETACH DELETE n");
+					tx.run("MATCH (n:Ecore) DETACH DELETE n");
 					return null;
 				}
 			});

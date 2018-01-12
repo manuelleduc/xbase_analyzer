@@ -26,7 +26,7 @@ public class EcoreSqliteReport {
 		statement.execute("DELETE FROM eclass");
 	}
 
-	public void produceEcoreSqlite(final DefaultDirectedGraph<EClass, DefaultEdge> graph)
+	public void produceEcoreSqlite(final DefaultDirectedGraph<EClass, ? extends DefaultEdge> graph)
 			throws SQLException, IOException {
 		final Connection connection = DriverManager.getConnection("jdbc:sqlite:result.db");
 		final Statement statement = connection.createStatement();
@@ -36,7 +36,7 @@ public class EcoreSqliteReport {
 		final List<EClass> sorted = graph.vertexSet().stream().sorted(new EClassNameComparator())
 				.collect(Collectors.toList());
 
-		final DijkstraShortestPath<EClass, DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
+		final DijkstraShortestPath<EClass, ? extends DefaultEdge> dsp = new DijkstraShortestPath<>(graph);
 
 		sorted.forEach(c1 -> {
 
@@ -55,7 +55,7 @@ public class EcoreSqliteReport {
 			sorted.forEach(c2 -> {
 				try {
 
-					final GraphPath<EClass, DefaultEdge> dst = dsp.getPath(c1, c2);
+					final GraphPath<EClass, ? extends DefaultEdge> dst = dsp.getPath(c1, c2);
 					final Integer cell = Optional.ofNullable(dst).map(x -> x.getLength()).orElse(null);
 					if (cell != null && cell > 0) {
 						statement.execute(

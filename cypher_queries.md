@@ -2,6 +2,8 @@
 
 Each query search for the production rules inherited from the parent grammars of a language but that can never be accessed by the language
 
+## Xtext
+
 BuildDSL
 
 ```
@@ -57,6 +59,18 @@ All the above
 MATCH (a:Rule)-[:DEPENDS_OF*]->(b:Rule) WHERE (a.grammar = 'org.xtext.builddsl.BuildDSL' or a.grammar = 'org.xtext.guicemodules.GuiceModules' or a.grammar = 'org.xtext.httprouting.Route' or a.grammar = 'org.xtext.mongobeans.MongoBeans' or a.grammar = 'org.xtext.scripting.Scripting' or a.grammar = 'org.xtext.template.Template' or a.grammar = 'org.xtext.tortoiseshell.TortoiseShell') WITH collect(distinct b) as bs MATCH (c:Rule) WHERE NOT (c in bs)
 AND (c.grammar ='org.eclipse.xtext.xbase.Xbase' or c.grammar='org.eclipse.xtext.xbase.Xtype') RETURN c
 ```
+
+
+## ECore
+
+
+TortoiseShell
+
+```
+MATCH (a:Ecore {package:'tortoiseShell'})-[:DEPENDS_OF*]->(b:EClass) WITH collect(distinct b) as bs MATCH (c:EClass) WHERE NOT (c in bs)
+AND (c.package ='xbase' or c.package='xtype') RETURN c
+```
+
 
 # Conclusion
 
