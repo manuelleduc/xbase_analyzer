@@ -73,14 +73,15 @@ public class Analyzer {
 	}
 
 	public void exec() throws IOException, SQLException {
-		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
-				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
-				"/org.xtext.httprouting/model/generated/Route.ecore",
-				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
-				"/org.xtext.scripting/model/generated/Scripting.ecore",
-				"/org.xtext.template/model/generated/Template.ecore",
-				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
+		// this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+		// "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+		// "/org.xtext.httprouting/model/generated/Route.ecore",
+		// "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+		// "/org.xtext.scripting/model/generated/Scripting.ecore",
+		// "/org.xtext.template/model/generated/Template.ecore",
+		// "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
 		// this.xtextAnalysis(
 		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext");
 
@@ -90,9 +91,10 @@ public class Analyzer {
 	}
 
 	private void xtextAnalysis() throws IOException, SQLException {
-		
+
 		new XtextSqliteReport().init();
-		
+		new XtextNeo4jReport().cleanup();
+
 		this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
@@ -216,23 +218,11 @@ public class Analyzer {
 			final AbstractElement alternatives = rule.getAlternatives();
 			visitAbstractElement(alternatives, rule, graph);
 		}
-		// for (final ParserRule pr : GrammarUtil.allParserRules(grammar)) {
-		// System.out.println(pr.getName() + ": " +
-		// pr.getType().getClassifier().getName());
-		// }
 
-		// final EList<AbstractMetamodelDeclaration> metamodelDeclarations =
-		// grammar.getMetamodelDeclarations();
-
-		// System.out.println(metamodelDeclarations.stream().map(Object::toString)
-		// .collect(Collectors.joining(System.lineSeparator())));
-
-		// xtextCSV(grammar);
-
-		new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
-
-		new XtextSqliteReport().xtextDependencyDB(grammar, graph, rules);
-		new XtextNeo4jReport().produce(grammar);
+		// new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
+		
+		 new XtextSqliteReport().xtextDependencyDB(grammar, graph, rules);
+		new XtextNeo4jReport().produce(graph);
 
 	}
 

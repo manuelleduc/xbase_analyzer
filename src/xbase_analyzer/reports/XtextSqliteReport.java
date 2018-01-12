@@ -64,11 +64,12 @@ public class XtextSqliteReport {
 											+ ar2.getName() + "\" and dst = " + dst + ");");
 
 							int idx = 0;
-							for (AbstractRule abstractRule : graphPath.getVertexList()) {
+							for (final AbstractRule abstractRule : graphPath.getVertexList()) {
 								final Grammar lookupGrammar = xtextUtil.lookupGrammar(abstractRule);
-								statement.execute("INSERT INTO xtext_dependency_path VALUES (" + idx + ", \""
-										+ g1.getName() + "\", \"" + ar1.getName() + "\", \"" + lookupGrammar.getName()
-										+ "\", \"" + abstractRule.getName() + "\")");
+								statement.execute("INSERT INTO xtext_dependency_path VALUES (\"" + ar1.getName()
+										+ "\", \"" + g1.getName() + "\", \"" + ar2.getName() + "\", \"" + g2.getName()
+										+ "\", " + idx + ", \"" + lookupGrammar.getName() + "\", \""
+										+ abstractRule.getName() + "\")");
 								idx++;
 							}
 						} catch (final SQLException e) {
@@ -107,9 +108,9 @@ public class XtextSqliteReport {
 	private void initializeDatabase(final Statement statement) throws SQLException {
 		statement.execute("CREATE TABLE  IF NOT EXISTS xtext (grammar TEXT, rule  TEXT)");
 		statement.execute(
-				"CREATE TABLE IF NOT EXISTS  xtext_dependencies ( grammarSrc TEXT, ruleSrc TEXT, grammarDst TEXT, ruleDst TEXT, dst NUMERIC )");
+				"CREATE TABLE IF NOT EXISTS xtext_dependencies ( grammarSrc TEXT, ruleSrc TEXT, grammarDst TEXT, ruleDst TEXT, dst NUMERIC )");
 		statement.execute(
-				"CREATE TABLE IF NOT EXISTS xtext_dependency_path (rank NUMERIC, grammar TEXT, rule TEXT, stepGrammar TEXT, stepRule TEXT)");
+				"CREATE TABLE IF NOT EXISTS xtext_dependency_path (ruleSrc TEXT, grammarSrc TEXT, ruleDst TEXT, grammarDst TEXT, rank NUMERIC, stepGrammar TEXT, stepRule TEXT)");
 
 	}
 }
