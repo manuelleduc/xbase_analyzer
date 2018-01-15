@@ -1,0 +1,49 @@
+digraph ecore_dependencies {
+  /* ecore_ files */
+
+subgraph cluster0 {
+  ecore_xbase [label="xbase::ecore"]
+  ecore_JavaVMTypes [label="JavaVMTypes::ecore"]
+  ecore_xannotations [label="xannotations::ecore"]
+  ecore_xtype [label="xtype::ecore"]
+  ecore_ecore [label="ecore::ecore"]
+  ecore_purexbase [label="purexbase::ecore"]
+
+  ecore_xbase -> ecore_JavaVMTypes [arrowhead=vee]
+  ecore_xtype -> ecore_JavaVMTypes [arrowhead=vee]
+  ecore_xannotations -> ecore_xbase [arrowhead=vee]
+  ecore_purexbase -> ecore_xtype [arrowhead=vee]
+  ecore_purexbase -> ecore_xbase [arrowhead=vee]
+}
+  /* Xtext files */
+
+subgraph cluster1 {
+  xtext_xbase [label="xbase::xtext"]
+  xtext_xtype [label="xtype::xtext"]
+  xtext_purexbase [label="purexbase::xtext"]
+  xtext_xbasewithannotations [label="xbasewithannotations::xtext"]
+
+  xtext_xbase -> xtext_xtype [arrowhead="empty"]
+  xtext_purexbase -> xtext_xbase [arrowhead="empty"]
+  xtext_xbasewithannotations -> xtext_xbase [arrowhead="empty"]
+}
+
+  /* Xtext to ecore dependencies */
+
+  xtext_xbase -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=blue]
+  xtext_xbase -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=blue]
+  xtext_xbase -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=blue]
+
+  xtext_xtype -> ecore_xtype [arrowhead="void", arrowtail="diamond", style=dashed, color=red]
+  xtext_xtype -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=red]
+  xtext_xtype -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=red]
+
+  xtext_purexbase -> ecore_purexbase [arrowhead="void", arrowtail="diamond", style=dashed, color=green]
+  xtext_purexbase -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=green]
+
+  xtext_xbasewithannotations -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=orange]
+  xtext_xbasewithannotations -> ecore_xtype [arrowhead="void", arrowtail="diamond", style=dashed, color=orange]
+  xtext_xbasewithannotations -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=orange]
+  xtext_xbasewithannotations -> ecore_xannotations [arrowhead="void", arrowtail="diamond", style=dashed, color=orange]
+
+}

@@ -1,6 +1,6 @@
 *.log
 *.csv
-*.dot
+/*.dot
 /bin
 /mvn
 /target
@@ -10,3 +10,4 @@
 *.ods
 *.pdf
 *.txt
+*.png

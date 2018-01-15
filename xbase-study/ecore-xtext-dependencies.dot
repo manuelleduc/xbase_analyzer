@@ -1,0 +1,6 @@
+digraph ecore_xtext_dependencies {
+xbase -> JavaVMTypes [arrowhead=void]
+xtype -> JavaVMTypes
+xannotation -> xbase
+
+}
