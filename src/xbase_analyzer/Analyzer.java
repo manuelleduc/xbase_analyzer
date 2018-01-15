@@ -75,18 +75,17 @@ public class Analyzer {
 	}
 
 	public void exec() throws IOException, SQLException {
-		
-		
-		
-		 this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-		 "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-		 "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
-		 "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
-		 "/org.xtext.httprouting/model/generated/Route.ecore",
-		 "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
-		 "/org.xtext.scripting/model/generated/Scripting.ecore",
-		 "/org.xtext.template/model/generated/Template.ecore",
-		 "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore");
+
+		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+				"/org.xtext.httprouting/model/generated/Route.ecore",
+				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+				"/org.xtext.scripting/model/generated/Scripting.ecore",
+				"/org.xtext.template/model/generated/Template.ecore",
+				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore",
+				"/org.eclipse.xtext.xbase/model/Xbase.ecore",
+				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
 
 		// BuildDSL
 		xtextAnalysis();
@@ -148,7 +147,7 @@ public class Analyzer {
 
 		}
 		new EcoreCSVReport().produceEcoreCSV(graph);
-		new EcoreGraphvizReport().produceEcoreGraphviz(graph);
+		new EcoreGraphvizReport().produceEcoreGraphviz(graph, "global");
 		new EcoreSqliteReport().produceEcoreSqlite(graph);
 		new EcoreNeo4jReport().produce(graph);
 
@@ -224,8 +223,8 @@ public class Analyzer {
 		}
 
 		// new XtextGraphvizReport().produceXtextGraphviz(grammar.getName(), graph);
-		
-		 new XtextSqliteReport().xtextDependencyDB(grammar, graph, rules);
+
+		new XtextSqliteReport().xtextDependencyDB(grammar, graph, rules);
 		new XtextNeo4jReport().produce(graph);
 
 	}

@@ -33,6 +33,7 @@ public final class EClassConsumer implements Consumer<EClassifier> {
 				eSuperTypes.forEach(pc -> {
 					registerClass(pc);
 					graph.addEdge(cls, pc, new InheritenceEdge());
+					graph.addEdge(pc, cls, new ParentOfEdge());
 				});
 				eSuperTypes.forEach(new EClassConsumer(visitedClasses, visitedPackages, graph));
 

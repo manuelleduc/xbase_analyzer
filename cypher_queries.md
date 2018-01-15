@@ -67,9 +67,16 @@ AND (c.grammar ='org.eclipse.xtext.xbase.Xbase' or c.grammar='org.eclipse.xtext.
 TortoiseShell
 
 ```
-MATCH (a:Ecore {package:'tortoiseShell'})-[:DEPENDS_OF*]->(b:EClass) WITH collect(distinct b) as bs MATCH (c:EClass) WHERE NOT (c in bs)
+MATCH
+  (a:EClass {package:'tortoiseShell'})-[:INHERIT|:PARENT_OF|:REFERENCE*]->(b:EClass) WITH collect(distinct b) as bs MATCH (c:EClass) WHERE NOT (c in bs)
 AND (c.package ='xbase' or c.package='xtype') RETURN c
 ```
+
+
+TODO:
+Rewrite using plain old jgrapht, it seems to be way faster for this kind of things.
+
+
 
 
 # Conclusion

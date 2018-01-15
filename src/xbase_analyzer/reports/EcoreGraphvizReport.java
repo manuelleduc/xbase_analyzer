@@ -12,7 +12,8 @@ import xbase_analyzer.utils.ecore.NamedEdge;
 
 public class EcoreGraphvizReport {
 
-	public void produceEcoreGraphviz(final DefaultDirectedGraph<EClass, NamedEdge> graph) throws IOException {
+	public void produceEcoreGraphviz(final DefaultDirectedGraph<EClass, NamedEdge> graph, final String name)
+			throws IOException {
 		final String nl = System.lineSeparator();
 		final StringBuilder sb = new StringBuilder();
 		sb.append("digraph {");
@@ -31,7 +32,7 @@ public class EcoreGraphvizReport {
 		sb.append(nl);
 		sb.append("}");
 
-		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("result_ecore.dot"));
+		final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("result_ecore" + name + ".dot"));
 
 		bufferedWriter.write(sb.toString());
 
