@@ -1,0 +1,45 @@
+digraph ecore_dependencies {
+  /* ecore_ files */
+
+  rankdir=BT;
+subgraph cluster0 {
+  ecore_xbase [label="xbase::ecore"]
+  ecore_JavaVMTypes [label="JavaVMTypes::ecore"]
+  ecore_xtype [label="xtype::ecore"]
+  ecore_ecore [label="ecore::ecore"]
+  ecore_mongobeans [label="mongoBeans::ecore"]
+
+  ecore_xbase -> ecore_JavaVMTypes [arrowhead=vee]
+  ecore_xtype -> ecore_JavaVMTypes [arrowhead=vee]
+
+  ecore_mongobeans -> ecore_xtype [arrowhead=vee]
+  ecore_mongobeans -> ecore_JavaVMTypes [arrowhead=vee]
+  ecore_mongobeans -> ecore_xbase [arrowhead=vee]
+
+}
+  /* Xtext files */
+
+subgraph cluster1 {
+
+  xtext_xbase [label="xbase::xtext"]
+  xtext_xtype [label="xtype::xtext"]
+  xtext_mongobeans [label="mongobeans::xtext"]
+
+  xtext_xbase -> xtext_xtype [arrowhead="empty"]
+
+  xtext_mongobeans -> xtext_xbase [arrowhead="empty"]
+
+}
+
+  /* Xtext to ecore dependencies */
+
+  xtext_xbase -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ε - redundant"]
+  xtext_xbase -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ε"]
+  xtext_xbase -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ecore"]
+
+  xtext_xtype -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ε - redundant"]
+  xtext_xtype -> ecore_xtype [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ε"]
+  xtext_xtype -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ecore"]
+
+  xtext_mongobeans -> ecore_mongobeans [arrowhead="void", arrowtail="diamond", style=dashed, color=green, label="generate"]
+}
