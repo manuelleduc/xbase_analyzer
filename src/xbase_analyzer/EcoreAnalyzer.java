@@ -36,39 +36,55 @@ public class EcoreAnalyzer {
 		 * 
 		 */
 
-		this.ecoreAnalysis("guiceModules", Arrays.asList("xtype", "xbase", "xAnnotations", "types"),
-				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+		// this.ecoreAnalysis("guiceModules", Arrays.asList("xtype", "xbase",
+		// "xAnnotations", "types"),
+		// "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		//
+		// this.ecoreAnalysis("build", Arrays.asList("xtype", "xbase", "types"),
+		// "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		//
+		// this.ecoreAnalysis("route", Arrays.asList("xtype", "xbase", "xAnnotations",
+		// "types"),
+		// "/org.xtext.httprouting/model/generated/Route.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		//
+		// this.ecoreAnalysis("mongoBeans", Arrays.asList("xtype", "xbase", "types"),
+		// "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		//
+		// this.ecoreAnalysis("scripting", Arrays.asList("xbase", "types"),
+		// "/org.xtext.scripting/model/generated/Scripting.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		//
+		// this.ecoreAnalysis("template", Arrays.asList("xtype", "xbase",
+		// "xAnnotations", "types"),
+		// "/org.xtext.template/model/generated/Template.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		//
+		// this.ecoreAnalysis("tortoiseShell", Arrays.asList("xbase", "types"),
+		// "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+
+		this.ecoreAnalysis("modelQueryLanguage", Arrays.asList("xtype", "xbase", "types"),
+				"/org.eclipse.xtext.mql/src-gen/org/eclipse/xtext/mqrepl/ModelQueryLanguage.ecore",
 				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.eclipse.xtext.xbase/model/Xbase.ecore",
-				"/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
-
-		this.ecoreAnalysis("build", Arrays.asList("xtype", "xbase", "types"),
-				"/org.xtext.builddsl/model/generated/BuildDSL.ecore", "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-				"/org.eclipse.xtext.xbase/model/Xbase.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
-
-		this.ecoreAnalysis("route", Arrays.asList("xtype", "xbase", "xAnnotations", "types"),
-				"/org.xtext.httprouting/model/generated/Route.ecore", "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-				"/org.eclipse.xtext.xbase/model/Xbase.ecore", "/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
-
-		this.ecoreAnalysis("mongoBeans", Arrays.asList("xtype", "xbase", "types"),
-				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore", "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-				"/org.eclipse.xtext.xbase/model/Xbase.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
-
-		this.ecoreAnalysis("scripting", Arrays.asList("xbase", "types"),
-				"/org.xtext.scripting/model/generated/Scripting.ecore", "/org.eclipse.xtext.xbase/model/Xbase.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
-
-		this.ecoreAnalysis("template", Arrays.asList("xtype", "xbase", "xAnnotations", "types"),
-				"/org.xtext.template/model/generated/Template.ecore", "/org.eclipse.xtext.xbase/model/Xtype.ecore",
-				"/org.eclipse.xtext.xbase/model/Xbase.ecore", "/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
-
-		this.ecoreAnalysis("tortoiseShell", Arrays.asList("xbase", "types"),
-				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore",
-				"/org.eclipse.xtext.xbase/model/Xbase.ecore",
 				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
 
 	}
@@ -110,6 +126,9 @@ public class EcoreAnalyzer {
 		}
 		res.stream().map(libClass -> libClass.getEPackage().getName() + "." + libClass.getName()).sorted()
 				.forEach(libClass -> System.out.println("- " + libClass + " unused"));
+		if (res.isEmpty()) {
+			System.out.println("nothing to declare");
+		}
 
 	}
 

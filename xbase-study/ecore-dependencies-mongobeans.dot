@@ -33,13 +33,13 @@ subgraph cluster1 {
 
   /* Xtext to ecore dependencies */
 
-  xtext_xbase -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ε - redundant"]
-  xtext_xbase -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ε"]
-  xtext_xbase -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ecore"]
+  xtext_xbase -> ecore_JavaVMTypes [arrowsize=0, arrowtail="diamond", style=dashed, color=blue, label="scope: ε - redundant"]
+  xtext_xbase -> ecore_xbase [arrowsize=0, arrowtail="diamond", style=dashed, color=blue, label="scope: ε"]
+  xtext_xbase -> ecore_ecore [arrowsize=0, arrowtail="diamond", style=dashed, color=blue, label="scope: ecore"]
 
-  xtext_xtype -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ε - redundant"]
-  xtext_xtype -> ecore_xtype [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ε"]
-  xtext_xtype -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ecore"]
+  xtext_xtype -> ecore_JavaVMTypes [arrowsize=0, arrowtail="diamond", style=dashed, color=red, label="scope: ε - redundant"]
+  xtext_xtype -> ecore_xtype [arrowsize=0, arrowtail="diamond", style=dashed, color=red, label="scope: ε"]
+  xtext_xtype -> ecore_ecore [arrowsize=0, arrowtail="diamond", style=dashed, color=red, label="scope: ecore"]
 
-  xtext_mongobeans -> ecore_mongobeans [arrowhead="void", arrowtail="diamond", style=dashed, color=green, label="generate"]
+  xtext_mongobeans -> ecore_mongobeans [arrowsize=0, arrowtail="diamond", style=dashed, color=green, label="generate"]
 }

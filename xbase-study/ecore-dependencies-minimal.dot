@@ -32,19 +32,19 @@ subgraph cluster1 {
 
   /* Xtext to ecore dependencies */
 
-  xtext_xbase -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ε - redundant"]
-  xtext_xbase -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ε"]
-  xtext_xbase -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=blue, label="scope: ecore"]
+  xtext_xbase -> ecore_JavaVMTypes [arrowsize=0, arrowtail="diamond", style=dashed, color=blue, label="scope: ε - redundant"]
+  xtext_xbase -> ecore_xbase [arrowsize=0, arrowtail="diamond", style=dashed, color=blue, label="scope: ε"]
+  xtext_xbase -> ecore_ecore [arrowsize=0, arrowtail="diamond", style=dashed, color=blue, label="scope: ecore"]
 
-  xtext_xtype -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ε - redundant"]
-  xtext_xtype -> ecore_xtype [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ε"]
-  xtext_xtype -> ecore_ecore [arrowhead="void", arrowtail="diamond", style=dashed, color=red, label="scope: ecore"]
+  xtext_xtype -> ecore_JavaVMTypes [arrowsize=0, arrowtail="diamond", style=dashed, color=red, label="scope: ε - redundant"]
+  xtext_xtype -> ecore_xtype [arrowsize=0, arrowtail="diamond", style=dashed, color=red, label="scope: ε"]
+  xtext_xtype -> ecore_ecore [arrowsize=0, arrowtail="diamond", style=dashed, color=red, label="scope: ecore"]
 
-  xtext_purexbase -> ecore_purexbase [arrowhead="void", arrowtail="diamond", style=dashed, color=green, label="generate"]
-  xtext_purexbase -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=green, label="scope: xbase"]
+  xtext_purexbase -> ecore_purexbase [arrowsize=0, arrowtail="diamond", style=dashed, color=green, label="generate"]
+  xtext_purexbase -> ecore_xbase [arrowsize=0, arrowtail="diamond", style=dashed, color=green, label="scope: xbase"]
 
-  xtext_xbasewithannotations -> ecore_xbase [arrowhead="void", arrowtail="diamond", style=dashed, color=orange, label="scope: xbase"]
-  xtext_xbasewithannotations -> ecore_xtype [arrowhead="void", arrowtail="diamond", style=dashed, color=orange, label="scope: xtype (unused)"]
-  xtext_xbasewithannotations -> ecore_JavaVMTypes [arrowhead="void", arrowtail="diamond", style=dashed, color=orange, label="scope: types"]
-  xtext_xbasewithannotations -> ecore_xannotations [arrowhead="void", arrowtail="diamond", style=dashed, color=orange, label="scope: ε"]
+  xtext_xbasewithannotations -> ecore_xbase [arrowsize=0, arrowtail="diamond", style=dashed, color=orange, label="scope: xbase"]
+  xtext_xbasewithannotations -> ecore_xtype [arrowsize=0, arrowtail="diamond", style=dashed, color=orange, label="scope: xtype (unused)"]
+  xtext_xbasewithannotations -> ecore_JavaVMTypes [arrowsize=0, arrowtail="diamond", style=dashed, color=orange, label="scope: types"]
+  xtext_xbasewithannotations -> ecore_xannotations [arrowsize=0, arrowtail="diamond", style=dashed, color=orange, label="scope: ε"]
 }

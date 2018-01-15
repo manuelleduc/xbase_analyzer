@@ -76,17 +76,21 @@ public class Analyzer {
 
 	public void exec() throws IOException, SQLException {
 
-		this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
-				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
-				"/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
-				"/org.xtext.httprouting/model/generated/Route.ecore",
-				"/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
-				"/org.xtext.scripting/model/generated/Scripting.ecore",
-				"/org.xtext.template/model/generated/Template.ecore",
-				"/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore",
-				"/org.eclipse.xtext.xbase/model/Xbase.ecore",
-				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+		// this.ecoreAnalysis("/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.xtext.builddsl/model/generated/BuildDSL.ecore",
+		// "/org.xtext.guicemodules/model/generated/GuiceModules.ecore",
+		// "/org.xtext.httprouting/model/generated/Route.ecore",
+		// "/org.xtext.mongobeans/model/generated/MongoBeans.ecore",
+		// "/org.xtext.scripting/model/generated/Scripting.ecore",
+		// "/org.xtext.template/model/generated/Template.ecore",
+		// "/org.xtext.tortoiseshell/model/generated/TortoiseShell.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
 
+		this.ecoreAnalysis("/org.eclipse.xtext.mql/src-gen/org/eclipse/xtext/mqrepl/ModelQueryLanguage.ecore",
+				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
 		// BuildDSL
 		xtextAnalysis();
 
@@ -97,40 +101,44 @@ public class Analyzer {
 		new XtextSqliteReport().init();
 		new XtextNeo4jReport().cleanup();
 
-		this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		// this.xtextAnalysis("/org.xtext.builddsl/src/org/xtext/builddsl/BuildDSL.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		//
+		// // GuiceModules
+		// this.xtextAnalysis("/org.xtext.guicemodules/src/org/xtext/guicemodules/GuiceModules.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		//
+		// // Route
+		// this.xtextAnalysis("/org.xtext.httprouting/src/org/xtext/httprouting/Route.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		//
+		// // MongoBeans
+		// this.xtextAnalysis("/org.xtext.mongobeans/src/org/xtext/mongobeans/MongoBeans.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		//
+		// // Scripting
+		// this.xtextAnalysis("/org.xtext.scripting/src/org/xtext/scripting/Scripting.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		//
+		// // Template
+		// this.xtextAnalysis("/org.xtext.template/src/org/xtext/template/Template.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		//
+		// // TortoiseShell
+		// this.xtextAnalysis("/org.xtext.tortoiseshell/src/org/xtext/tortoiseshell/TortoiseShell.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
 
-		// GuiceModules
-		this.xtextAnalysis("/org.xtext.guicemodules/src/org/xtext/guicemodules/GuiceModules.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
-		// Route
-		this.xtextAnalysis("/org.xtext.httprouting/src/org/xtext/httprouting/Route.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
-		// MongoBeans
-		this.xtextAnalysis("/org.xtext.mongobeans/src/org/xtext/mongobeans/MongoBeans.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
-		// Scripting
-		this.xtextAnalysis("/org.xtext.scripting/src/org/xtext/scripting/Scripting.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
-		// Template
-		this.xtextAnalysis("/org.xtext.template/src/org/xtext/template/Template.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
-
-		// TortoiseShell
-		this.xtextAnalysis("/org.xtext.tortoiseshell/src/org/xtext/tortoiseshell/TortoiseShell.xtext",
+		this.xtextAnalysis("/org.eclipse.xtext.mql/src/org/eclipse/xtext/mqrepl/ModelQueryLanguage.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
 				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
 	}

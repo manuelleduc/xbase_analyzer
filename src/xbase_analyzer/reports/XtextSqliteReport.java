@@ -76,10 +76,11 @@ public class XtextSqliteReport {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					} else {
-						System.out.println(g1.getName() + "." + ar1.getName() + " and " + g2.getName() + "."
-								+ ar2.getName() + " are not connected");
-					}
+					} 
+//					else {
+//						System.out.println(g1.getName() + "." + ar1.getName() + " and " + g2.getName() + "."
+//								+ ar2.getName() + " are not connected");
+//					}
 				} else {
 					// we do not deal with mandatory elements, defined in the core of xtext such as
 					// ML_COMMENT or WS or ANY_OTHER.
