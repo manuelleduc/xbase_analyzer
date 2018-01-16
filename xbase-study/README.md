@@ -35,7 +35,7 @@ Without an import to `Xbase`, a `XBlockExpression` EClass is created in `Turtois
 Search query: https://github.com/search?p=3&q=XbaseWithAnnotations+extension%3Axtext+stars%3A10&type=Code&utf8=%E2%9C%93
 
 - https://github.com/wikthewiz/gs
-- https://github.com/cdietrich/mql
+- https://github.com/cdietrich/mql (Xbase)
 - https://github.com/lunifera/lunifera-dsl + https://github.com/lunifera/lunifera-xtext-runtimebuilder-example (XbaseWithAnnotations)
 - https://github.com/serhatGezgin/snow/tree/master (XbaseWithAnnotations)
 - https://github.com/JGen-Notes/JGenNotesDataModel (XbaseWithAnnotations)
