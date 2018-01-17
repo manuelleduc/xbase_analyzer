@@ -88,9 +88,27 @@ public class Analyzer {
 		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
 		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
 
-		this.ecoreAnalysis("/org.eclipse.xtext.mql/src-gen/org/eclipse/xtext/mqrepl/ModelQueryLanguage.ecore",
-				"/org.eclipse.xtext.xbase/model/Xtype.ecore", "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// this.ecoreAnalysis("/org.eclipse.xtext.mql/src-gen/org/eclipse/xtext/mqrepl/ModelQueryLanguage.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+
+		// this.ecoreAnalysis("/eu.jgen.notes.dm/model/generated/DataModel.ecore",
+		// "/org.eclipse.xtext.xbase/model/XAnnotations.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xbase.ecore");
+
+		// this.ecoreAnalysis("/com.nukulargames.gdx4e.actors.model/model/Actors.ecore",
+		// "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+		// "/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore",
+		// "/org.eclipse.xtext.xbase/model/XAnnotations.ecore");
+
+		this.ecoreAnalysis("/org.xtext.language/model/generated/Language.ecore",
+				"/org.eclipse.xtext.xbase/model/XAnnotations.ecore", "/org.eclipse.xtext.xbase/model/Xtype.ecore",
+				"/org.eclipse.xtext.xbase/model/Xbase.ecore",
 				"/org.eclipse.xtext.common.types/model/JavaVMTypes.ecore");
+
 		// BuildDSL
 		xtextAnalysis();
 
@@ -98,6 +116,7 @@ public class Analyzer {
 
 	private void xtextAnalysis() throws IOException, SQLException {
 
+		
 		new XtextSqliteReport().init();
 		new XtextNeo4jReport().cleanup();
 
@@ -138,9 +157,24 @@ public class Analyzer {
 		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
 		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
 
-		this.xtextAnalysis("/org.eclipse.xtext.mql/src/org/eclipse/xtext/mqrepl/ModelQueryLanguage.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
-				"/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+		// this.xtextAnalysis("/org.eclipse.xtext.mql/src/org/eclipse/xtext/mqrepl/ModelQueryLanguage.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// this.xtextAnalysis("/eu.jgen.notes.dm/src/eu/jgen/notes/dm/DataModel.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// this.xtextAnalysis("/com.nukulargames.gdx4e.actors.dsl/src/com/nukulargames/gdx4e/actors/dsl/Dsl.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
+
+		// this.xtextAnalysis("/org.xtext.language/src/org/xtext/language/Language.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/annotations/XbaseWithAnnotations.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xbase.xtext",
+		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
 	}
 
 	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {

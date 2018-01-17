@@ -64,17 +64,17 @@ AND (c.grammar ='org.eclipse.xtext.xbase.Xbase' or c.grammar='org.eclipse.xtext.
 ## ECore
 
 
-TortoiseShell
+generic query
 
 ```
-MATCH
-  (a:EClass {package:'tortoiseShell'})-[:INHERIT|:PARENT_OF|:REFERENCE*]->(b:EClass) WITH collect(distinct b) as bs MATCH (c:EClass) WHERE NOT (c in bs)
-AND (c.package ='xbase' or c.package='xtype') RETURN c
+MATCH (a:EClass {package: '$mainPackage'})
+CALL apoc.path.subgraphNodes(a, {relationshipFilter:'>'}) YIELD node
+WITH collect(distinct node) as nodes
+MATCH (b:EClass) WHERE (b.package='$targetPackage1' or b.package='$package2' or ...) and not b in nodes
+RETURN count(b)
 ```
 
 
-TODO:
-Rewrite using plain old jgrapht, it seems to be way faster for this kind of things.
 
 
 
