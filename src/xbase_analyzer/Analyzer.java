@@ -47,6 +47,7 @@ import org.junit.Test;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
@@ -71,6 +72,9 @@ public class Analyzer {
 
 	@Test
 	public void test() throws Exception {
+		
+		Guice.createInjector(new XbaseAnalyzerModule());
+		
 		new Analyzer().exec();
 	}
 
@@ -116,7 +120,6 @@ public class Analyzer {
 
 	private void xtextAnalysis() throws IOException, SQLException {
 
-		
 		new XtextSqliteReport().init();
 		new XtextNeo4jReport().cleanup();
 
@@ -177,22 +180,35 @@ public class Analyzer {
 		// "/org.eclipse.xtext.xbase/src/org/eclipse/xtext/xbase/Xtype.xtext");
 	}
 
-	private void ecoreAnalysis(final String... paths) throws IOException, SQLException {
+	private void ecoreAnalysis(final String mainPath, final String... paths) throws IOException, SQLException {
+		final EcoreDependencyAnalyzer eda = new EcoreDependencyAnalyzer();
 		final ResourceSet set = initResourceSet();
 		final DefaultDirectedGraph<EClass, NamedEdge> graph = new DefaultDirectedGraph<>(NamedEdge.class);
 		final Set<EClass> visitedClasses = new HashSet<>();
 		final Set<EPackage> visitedPackages = new HashSet<>();
+
+		loadEcoreFromPath(eda, set, graph, visitedClasses, visitedPackages, mainPath);
 		for (final String path : paths) {
-			final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
-			final EPackage epackage = (EPackage) resource.getContents().get(0);
-			new EcoreDependencyAnalyzer().ecoreDependencyAnalysis(epackage, graph, visitedClasses, visitedPackages);
+			loadEcoreFromPath(eda, set, graph, visitedClasses, visitedPackages, path);
 
 		}
+		
 		new EcoreCSVReport().produceEcoreCSV(graph);
 		new EcoreGraphvizReport().produceEcoreGraphviz(graph, "global");
 		new EcoreSqliteReport().produceEcoreSqlite(graph);
 		new EcoreNeo4jReport().produce(graph);
+		
+		
+//		new EcoreDependencyReport().analyze();
 
+	}
+
+	private void loadEcoreFromPath(final EcoreDependencyAnalyzer eda, final ResourceSet set,
+			final DefaultDirectedGraph<EClass, NamedEdge> graph, final Set<EClass> visitedClasses,
+			final Set<EPackage> visitedPackages, final String path) {
+		final Resource resource = set.getResource(URI.createPlatformPluginURI(path, false), true);
+		final EPackage epackage = (EPackage) resource.getContents().get(0);
+		eda.ecoreDependencyAnalysis(epackage, graph, visitedClasses, visitedPackages);
 	}
 
 	private ResourceSet initResourceSet() {

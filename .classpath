@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="mvn/aopalliance.aopalliance-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="mvn/com.google.guava.guava-19.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="mvn/com.google.inject.guice-4.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="mvn/javax.inject.javax.inject-1.jar"/>
 	<classpathentry exported="true" kind="lib" path="mvn/org.neo4j.driver.neo4j-java-driver-1.4.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="mvn/org.xerial.sqlite-jdbc-3.21.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="mvn/org.jgrapht.jgrapht-core-1.1.0.jar"/>

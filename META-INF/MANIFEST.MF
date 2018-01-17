@@ -14,4 +14,8 @@ Bundle-ClassPath: mvn/net.sf.supercsv.super-csv-2.4.0.jar,
  .,
  mvn/org.jgrapht.jgrapht-core-1.1.0.jar,
  mvn/org.xerial.sqlite-jdbc-3.21.0.jar,
- mvn/org.neo4j.driver.neo4j-java-driver-1.4.4.jar
+ mvn/org.neo4j.driver.neo4j-java-driver-1.4.4.jar,
+ mvn/aopalliance.aopalliance-1.0.jar,
+ mvn/com.google.guava.guava-19.0.jar,
+ mvn/com.google.inject.guice-4.1.0.jar,
+ mvn/javax.inject.javax.inject-1.jar
